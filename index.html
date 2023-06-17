@@ -1,0 +1,21 @@
+<html>
+
+<head>
+  <link rel="stylesheet" href="quiz.css">
+</head>
+
+<body>
+  <div id="app" class="root">
+    <div class="quiz">
+      <div>
+        Please choose a quiz from one of the following choices:
+      </div>
+      <quiz :page-names="pageNames" :pages="pages" :selected-page="activePageName" @select-page="setActivePage"></quiz>
+    </div>
+  </div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="quiz.js"></script>
+
+</html>

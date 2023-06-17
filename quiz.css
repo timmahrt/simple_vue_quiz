@@ -1,0 +1,50 @@
+body {
+    font-family: "Meiryo", "Hiragino Sans", "Yu Gothic", "Noto Sans CJK", "MS Gothic", sans-serif;
+}
+
+.root {
+    display: flex;
+    justify-content: center;
+}
+
+.quiz {
+    width: 80%;
+}
+
+.quiz-button {
+    margin: 8px;
+    border: 0;
+    border-radius: 3px;
+    padding: 4px;
+}
+
+.quiz-button__active {
+    background-color: rgb(154, 147, 230);
+}
+
+.quiz-item__result {
+    width: 72px;
+    display: inline-block;
+}
+
+.quiz-item__correct {
+    color: green;
+}
+
+.quiz-item__incorrect {
+    color: red;
+}
+
+.quiz-item__hint {
+    margin: 12px;
+    display: flex;
+}
+
+.quiz-item__hint-button {
+    display: inline-block;
+}
+
+.quiz-item__hint-text {
+    display: inline-block;
+    margin: 8px;
+}
