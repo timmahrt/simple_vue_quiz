@@ -45,9 +45,9 @@ Vue.component('quiz-item', {
             <form>
               <div v-for="response in responses" class="quiz-item__response-row">
                 <span class="quiz-item__result">
-                  <span v-if="selection === response">
-                    <span v-if="response === correctResponse" class="quiz-item__correct">Excellent!</span>
-                    <span v-else class="quiz-item__incorrect">Wrong</span>
+                  <span v-show="selection === response">
+                    <span v-show="response === correctResponse" class="quiz-item__correct">Excellent!</span>
+                    <span v-show="response !== correctResponse" class="quiz-item__incorrect">Wrong</span>
                   </span>
                 </span>
                 <label>
@@ -64,7 +64,7 @@ Vue.component('quiz-item', {
                   :isActive="isShowingHint"
                 ></quiz-button>
               </div>
-              <div v-if="isShowingHint" class="quiz-item__hint-text">
+              <div v-show="isShowingHint" class="quiz-item__hint-text">
                 {{ hint }}
               </div>
             </div>
@@ -87,8 +87,10 @@ Vue.component('quiz-item', {
 Vue.component('quiz-items', {
   props: ['page', 'active'],
   template: `
-        <div v-if="active" class="page">
-          <h3>{{ page.title }}</h3>
+        <div v-show="active" class="page">
+          <div class="page__title">
+            {{ page.title }}
+          </div>
           <div v-for="(item, index) in page.items">
             <quiz-item
               :index="index + 1"
