@@ -144,7 +144,7 @@ new Vue({
     activePageName: null
   },
   mounted() {
-    this.loadJSON('quizData.json')
+    this.loadJSON('/quizData.json')
   },
   computed: {
     pageNames() {
