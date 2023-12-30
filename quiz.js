@@ -39,17 +39,23 @@ Vue.component('quiz-item', {
   props: ['index', 'question', 'responses', 'correctResponse', 'hint'],
   template: `
           <div class="item">
-            <p>{{index}}. {{ question }}</p>
-            <div v-for="response in responses">
-              <span class="quiz-item__result">
-                <span v-if="selection === response">
-                  <span v-if="response === correctResponse" class="quiz-item__correct">Excellent!</span>
-                  <span v-else class="quiz-item__incorrect">Wrong</span>
-                </span>
-              </span>
-              <input type="radio" v-model="selection" :value="response">
-              <label>{{ response }}</label>
+            <div class="quiz-item__question">
+              {{index}}. {{ question }}
             </div>
+            <form>
+              <div v-for="response in responses" class="quiz-item__response-row">
+                <span class="quiz-item__result">
+                  <span v-if="selection === response">
+                    <span v-if="response === correctResponse" class="quiz-item__correct">Excellent!</span>
+                    <span v-else class="quiz-item__incorrect">Wrong</span>
+                  </span>
+                </span>
+                <label>
+                  <input type="radio" :name="index" v-model="selection" :value="response">
+                  {{ response }}
+                </label>
+              </div>
+            </form>
             <div class="quiz-item__hint">
               <div class="quiz-item__button-container">
                 <quiz-button
