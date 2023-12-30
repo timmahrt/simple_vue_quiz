@@ -1,13 +1,15 @@
+<!DOCTYPE html>
 <html>
 
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="quiz.css">
 </head>
 
 <body>
   <div id="app" class="root">
     <div class="quiz">
-      <div>
+      <div class="quiz-selection__prompt">
         Please choose a quiz from one of the following choices:
       </div>
       <quiz :page-names="pageNames" :pages="pages" :selected-page="activePageName" @select-page="setActivePage"></quiz>
