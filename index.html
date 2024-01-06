@@ -9,10 +9,9 @@
 <body>
   <div id="app" class="root">
     <div class="quiz">
-      <div class="quiz-selection__prompt">
-        Please choose a quiz from one of the following choices:
-      </div>
-      <quiz :page-names="pageNames" :pages="pages" :selected-page="activePageName" @select-page="setActivePage"></quiz>
+      <quiz :page-names="pageNames" :pages="pages" :selected-page="activePageName" :selected-page-num="activePageNum"
+        :batch-size="batchSize" :active-pages-max-page-num="activePagesMaxPageNum" @select-quiz="setActiveQuiz"
+        @select-page="setActivePaginationPage"></quiz>
     </div>
   </div>
 </body>

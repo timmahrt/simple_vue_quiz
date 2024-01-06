@@ -15,6 +15,8 @@ Vue.component('quiz-button', {
   }
 });
 
+// You can use this to select quizzes based on the name of the quiz
+// When multiple quizzes are selectable on the same page.
 Vue.component('quiz-selector', {
   props: ['quizzes', 'selectedQuiz'],
   template: `
@@ -35,12 +37,43 @@ Vue.component('quiz-selector', {
   }
 });
 
+// You can use this to break up quizzes into multiple chunks.
+Vue.component('quiz-pagination-navigation', {
+  props: ['numPages', 'selectedPage'],
+  template: `
+    <div class="quiz-selector">
+    Page Select:
+    <quiz-button
+      v-for="page in pageNumbers"
+      @button-click="onClick"
+      :name="page + 1"
+      :isActive="selectedPage === page"
+      :key="page"
+    ></quiz-button>
+    </div>
+  `,
+  computed: {
+    pageNumbers() { return Array.from({ length: this.numPages }, (_, index) => index); }
+  },
+  methods: {
+    onClick(page) {
+      this.$emit('select-page', page - 1);
+    }
+  }
+});
+
 Vue.component('quiz-item', {
-  props: ['index', 'question', 'responses', 'correctResponse', 'hint'],
+  props: ['index', 'question', 'responses', 'correctResponse', 'hint', 'highlight'],
   template: `
           <div class="item">
             <div class="quiz-item__question">
-              {{index}}. {{ question }}
+              {{index}}.
+              <span v-if="!hasHighlight">
+                {{ question }}
+              </span>
+              <span v-else>
+                {{ preHighlight }} <span class="quiz-item__highlighted">{{ highlight }}</span> {{ postHighlight }}
+              </span>
             </div>
             <form>
               <div v-for="response in responses" class="quiz-item__response-row">
@@ -76,6 +109,25 @@ Vue.component('quiz-item', {
       this.isShowingHint = !this.isShowingHint
     }
   },
+  computed: {
+    hasHighlight() {
+      return this.highlight && this.question.includes(this.highlight)
+    },
+    preHighlight() {
+      if (!this.hasHighlight) {
+        return ''
+      }
+
+      return this.question.split(this.highlight, 2)[0]
+    },
+    postHighlight() {
+      if (!this.hasHighlight) {
+        return ''
+      }
+
+      return this.question.split(this.highlight, 2)[1]
+    },
+  },
   data() {
     return {
       selection: null,
@@ -85,40 +137,57 @@ Vue.component('quiz-item', {
 });
 
 Vue.component('quiz-items', {
-  props: ['page', 'active'],
+  props: ['page', 'active', 'batchSize', 'batchId'],
   template: `
         <div v-show="active" class="page">
           <div class="page__title">
             {{ page.title }}
           </div>
-          <div v-for="(item, index) in page.items">
+          <div v-for="(item, index) in items">
             <quiz-item
-              :index="index + 1"
+              :index="(index + 1) + startIndex"
               :question="item.question"
               :responses="item.responses"
               :correct-response="item.correctResponse"
               :hint="item.hint"
+              :highlight="item.highlight"
             ></quiz-item>
           </div>
         </div>
-      `
+      `,
+  computed: {
+    startIndex() { return this.batchId * this.batchSize },
+    endIndex() { return (this.batchId + 1) * this.batchSize },
+    items() {
+      return this.page.items.slice(this.startIndex, this.endIndex)
+    }
+  }
 });
 
 Vue.component('quiz', {
-  props: ['pageNames', 'pages', 'selectedPage'],
+  props: ['pageNames', 'pages', 'selectedPage', 'selectedPageNum', 'batchSize', 'activePagesMaxPageNum'],
   template: `
     <div>
       <quiz-selector 
+        v-if="pageNames.length > 1"
         :quizzes="pageNames"
         :selected-quiz="selectedPage"
-        @select-quiz="onClick"
+        @select-quiz="selectQuiz"
       ></quiz-selector>
       <quiz-items
         v-for="page in pages"
         :page="page"
         :active="page.title === selectedPage"
         :key="page.title"
+        :batchSize="batchSize"
+        :batchId="selectedPageNum"
       ></quiz-items>
+      <quiz-pagination-navigation
+        v-if="activePagesMaxPageNum > 1"
+        :numPages="activePagesMaxPageNum"
+        :selected-page="selectedPageNum"
+        @select-page="selectPage"
+      ></quiz-pagination-navigation>
     </div>
 `,
   computed: {
@@ -131,8 +200,11 @@ Vue.component('quiz', {
     }
   },
   methods: {
-    onClick(name) {
-      this.$emit('select-page', name);
+    selectQuiz(name) {
+      this.$emit('select-quiz', name);
+    },
+    selectPage(page) {
+      this.$emit('select-page', page);
     }
   }
 })
@@ -141,18 +213,34 @@ new Vue({
   el: '#app',
   data: {
     pages: [],
-    activePageName: null
+    activePageName: null,
+    activePageNum: null,
+    batchSize: 10
   },
   mounted() {
     this.loadJSON('/quizData.json')
   },
   computed: {
+    activePage() {
+      if (!this.activePageName) {
+        return null
+      }
+
+      return this.pages.find(page => page.title === this.activePageName)
+    },
     pageNames() {
       const result = []
       this.pages.forEach(page => {
         result.push(page.title)
       })
       return result
+    },
+    activePagesMaxPageNum() {
+      if (!this.activePage) {
+        return 0
+      }
+
+      return Math.ceil(this.activePage.items.length / this.batchSize)
     }
   },
   methods: {
@@ -163,7 +251,7 @@ new Vue({
           this.pages = data['pages']
           if (this.pages.length > 0) {
             this.activePageName = this.pages[0].title;
-            console.log(this.activePageName)
+            this.activePageNum = 0;
           }
         })
         .catch(error => {
@@ -171,8 +259,11 @@ new Vue({
           console.error(error);
         });
     },
-    setActivePage(pageName) {
+    setActiveQuiz(pageName) {
       this.activePageName = pageName
+    },
+    setActivePaginationPage(pageNum) {
+      this.activePageNum = pageNum
     }
   }
 });

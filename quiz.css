@@ -11,8 +11,6 @@ body {
     width: 80%;
 }
 
-.quiz-selection__prompt {}
-
 .page__title {
     font-weight: 700;
     margin: 8px;
@@ -28,8 +26,6 @@ body {
 .quiz-button__active {
     background-color: rgb(154, 147, 230);
 }
-
-.quiz-item__question {}
 
 .quiz-item__result {
     width: 72px;
@@ -60,4 +56,10 @@ body {
 .quiz-item__hint-text {
     display: inline-block;
     margin: 8px;
+}
+
+.quiz-item__highlighted {
+    text-decoration-line: underline;
+    text-decoration-thickness: 3px;
+    text-decoration-color: blue;
 }
